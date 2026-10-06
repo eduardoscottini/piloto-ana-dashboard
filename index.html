@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Piloto · Monitoramento de posts</title>
+<title>Piloto · Monitoramento de posts (dados reais)</title>
 <style>
   :root {
     --bg: #0b0d12;
@@ -283,7 +283,7 @@
       <div class="logo">M</div>
       <div>
         <h1>Monitor Posts</h1>
-        <p>Piloto · 14 dias</p>
+        <p>Piloto · 14 dias · dados reais</p>
       </div>
     </div>
 
@@ -305,7 +305,7 @@
 
     <div class="aside-block" style="margin-top:auto">
       <h2>Alerta WhatsApp</h2>
-      <p style="font-size:12px;color:var(--muted)">Diário · 09:00 BRT<br/>Top 3 por engajamento + links</p>
+      <p style="font-size:12px;color:var(--muted)">Próximo passo · 09:00 BRT<br/>Top 3 por engajamento + links</p>
     </div>
   </aside>
 
@@ -313,9 +313,9 @@
     <div class="top">
       <div>
         <h2>Menções com métrica do post</h2>
-        <p class="sub">LinkedIn keyword (sem depender de @) · Instagram · Imprensa digital</p>
+        <p class="sub">LinkedIn (páginas públicas das marcas) · Instagram (gap) · Imprensa digital</p>
       </div>
-      <span class="badge">Dados ilustrativos · não são live</span>
+      <span class="badge">Coleta real · 60 itens · 0 IG</span>
     </div>
 
     <div class="tabs" role="tablist">
@@ -328,16 +328,18 @@
     </div>
 
     <div class="legend">
-      <i><span class="pill li">LI</span> LinkedIn — busca por keyword</i>
-      <i><span class="pill ig">IG</span> Instagram — interação do post</i>
+      <i><span class="pill li">LI</span> LinkedIn — posts públicos (métrica do post)</i>
+      <i><span class="pill ig">IG</span> Instagram — sem token Apify (0 nesta coleta)</i>
       <i><span class="pill press">News</span> Imprensa digital</i>
     </div>
 
     <div class="feed" id="feed"></div>
 
     <footer class="note">
-      Rascunho piloto — dados ilustrativos. Métricas de post (likes, comentários, shares) são placeholders realistas para validar o layout com Ana.
-      Alcance do post aparece só quando a fonte entregar; caso contrário, “—”. Sem TV/rádio. Knewin continua referência de imprensa; este piloto foca o buraco do social.
+      Coleta real (2026-10-06 20:59 UTC). Métricas de post vindas da UI pública do LinkedIn (likes/comentários quando visíveis). Shares e alcance = null quando não públicos.
+      Instagram: 0 — sem APIFY_API_TOKEN; Google News RSS + páginas canônicas para imprensa.
+      LinkedIn keyword de terceiros (sem @) ainda depende de Apify/scraper dedicado — nesta rodada: posts das páginas oficiais das 5 marcas.
+      Sem TV/rádio. Nenhuma métrica inventada.
     </footer>
   </main>
 </div>
@@ -345,88 +347,784 @@
 <script>
 const DATA = [
   {
-    id: 1, brand: "starian", channel: "li",
-    date: "2026-10-05", sentiment: "pos",
-    snippet: "Acompanhei o movimento da <mark>Starian</mark> pós-cisão Softplan — foco em SaaS privado com Sienge, Projuris e Checklist Fácil no mesmo guarda-chuva. Vale olhar o play de M&A.",
-    url: "https://www.linkedin.com/feed/update/urn:li:activity:illustrative-001",
-    likes: 184, comments: 27, shares: 19, reach: 12400
+    "id": 1,
+    "brand": "contato",
+    "channel": "li",
+    "date": "2026-10-06",
+    "sentiment": "neu",
+    "snippet": "Pausa nas multas NR-1 ≠ fim dos riscos psicossociais",
+    "url": "https://br.linkedin.com/company/contatoseguro",
+    "likes": 1,
+    "comments": null,
+    "shares": null,
+    "reach": null
   },
   {
-    id: 2, brand: "starian", channel: "press",
-    date: "2026-10-04", sentiment: "pos",
-    snippet: "General Atlantic aporta na <mark>Starian</mark>, spin-off privado da Softplan voltado a construção, legal tech e eficiência operacional.",
-    url: "https://example-news.com/starian-general-atlantic",
-    likes: null, comments: null, shares: null, reach: null
+    "id": 2,
+    "brand": "starian",
+    "channel": "li",
+    "date": "2026-10-05",
+    "sentiment": "neu",
+    "snippet": "Insights Kodak/Netflix Gabriela Torres",
+    "url": "https://br.linkedin.com/company/somos-starian",
+    "likes": 21,
+    "comments": 1,
+    "shares": null,
+    "reach": null
   },
   {
-    id: 3, brand: "checklist", channel: "ig",
-    date: "2026-10-05", sentiment: "pos",
-    snippet: "Auditoria de loja sem papel ✨ Usamos <mark>Checklist Fácil</mark> no celular — foto, GPS e plano de ação no mesmo fluxo. #ChecklistFácil",
-    url: "https://www.instagram.com/p/illustrative-cf-01/",
-    likes: 312, comments: 41, shares: 18, reach: 8900
+    "id": 3,
+    "brand": "sienge",
+    "channel": "li",
+    "date": "2026-10-05",
+    "sentiment": "neu",
+    "snippet": "Podcast escassez/rotatividade mão de obra na construção",
+    "url": "https://br.linkedin.com/company/sienge",
+    "likes": 7,
+    "comments": 2,
+    "shares": null,
+    "reach": null
   },
   {
-    id: 4, brand: "checklist", channel: "li",
-    date: "2026-10-03", sentiment: "neu",
-    snippet: "Alguém tem experiência com <mark>Checklist Fácil</mark> vs planilha + Forms para inspeção de obra? Preciso padronizar FVS em 12 canteiros.",
-    url: "https://www.linkedin.com/feed/update/urn:li:activity:illustrative-002",
-    likes: 56, comments: 14, shares: 3, reach: null
+    "id": 4,
+    "brand": "sienge",
+    "channel": "li",
+    "date": "2026-10-05",
+    "sentiment": "neu",
+    "snippet": "IA gera orçamento com EAP em 2 minutos — Tour Virtual",
+    "url": "https://br.linkedin.com/company/sienge",
+    "likes": 6,
+    "comments": 3,
+    "shares": null,
+    "reach": null
   },
   {
-    id: 5, brand: "projuris", channel: "li",
-    date: "2026-10-06", sentiment: "pos",
-    snippet: "Contratos e contencioso no mesmo lugar: migrando o jurídico corporativo para <mark>Projuris</mark> Empresas. SLA de análise caiu bastante no piloto.",
-    url: "https://www.linkedin.com/feed/update/urn:li:activity:illustrative-003",
-    likes: 97, comments: 22, shares: 11, reach: 6100
+    "id": 5,
+    "brand": "checklist",
+    "channel": "li",
+    "date": "2026-10-05",
+    "sentiment": "neu",
+    "snippet": "ISO 9001:2026 publicada — evidência na próxima auditoria interna",
+    "url": "https://br.linkedin.com/company/checklist-facil",
+    "likes": null,
+    "comments": null,
+    "shares": null,
+    "reach": null
   },
   {
-    id: 6, brand: "projuris", channel: "ig",
-    date: "2026-10-02", sentiment: "pos",
-    snippet: "Legal ops na prática ⚖️ Bastidores do time usando <mark>Projuris</mark> no dia a dia. #LegalTech #Projuris",
-    url: "https://www.instagram.com/p/illustrative-pj-01/",
-    likes: 228, comments: 19, shares: 9, reach: 5400
+    "id": 6,
+    "brand": "starian",
+    "channel": "li",
+    "date": "2026-10-03",
+    "sentiment": "neu",
+    "snippet": "Proud Tech Summit bastidores Yasmin Ramos",
+    "url": "https://br.linkedin.com/company/somos-starian",
+    "likes": 15,
+    "comments": null,
+    "shares": null,
+    "reach": null
   },
   {
-    id: 7, brand: "sienge", channel: "li",
-    date: "2026-10-05", sentiment: "pos",
-    snippet: "Construtora mid-market: fechamos o mês com medições e compras no <mark>Sienge</mark>. Integração com Checklist Fácil salvou a vistoria de entrega.",
-    url: "https://www.linkedin.com/feed/update/urn:li:activity:illustrative-004",
-    likes: 143, comments: 31, shares: 16, reach: 9800
+    "id": 7,
+    "brand": "projuris",
+    "channel": "li",
+    "date": "2026-10-02",
+    "sentiment": "neu",
+    "snippet": "Projuris Summit 2026 — agentes de IA no jurídico (Fernando Ribeiro)",
+    "url": "https://br.linkedin.com/company/projuris",
+    "likes": 16,
+    "comments": null,
+    "shares": null,
+    "reach": null
   },
   {
-    id: 8, brand: "sienge", channel: "press",
-    date: "2026-10-01", sentiment: "neu",
-    snippet: "Ecossistema <mark>Sienge</mark> segue como âncora da vertical de construção da Starian no mercado privado brasileiro.",
-    url: "https://example-news.com/sienge-ecossistema",
-    likes: null, comments: null, shares: null, reach: null
+    "id": 8,
+    "brand": "contato",
+    "channel": "li",
+    "date": "2026-10-02",
+    "sentiment": "neu",
+    "snippet": "Encerramento CONGREGARH 2026 — obrigado",
+    "url": "https://br.linkedin.com/company/contatoseguro",
+    "likes": 23,
+    "comments": null,
+    "shares": null,
+    "reach": null
   },
   {
-    id: 9, brand: "contato", channel: "ig",
-    date: "2026-10-04", sentiment: "pos",
-    snippet: "Canal de ética ativo 🔒 Implementamos <mark>Contato Seguro</mark> — denúncia anônima e trilha de compliance. #ContatoSeguro #Compliance",
-    url: "https://www.instagram.com/p/illustrative-cs-01/",
-    likes: 167, comments: 12, shares: 7, reach: 4200
+    "id": 9,
+    "brand": "starian",
+    "channel": "li",
+    "date": "2026-10-01",
+    "sentiment": "neu",
+    "snippet": "Radar Starian — IA além do hype",
+    "url": "https://br.linkedin.com/company/somos-starian",
+    "likes": 5,
+    "comments": null,
+    "shares": null,
+    "reach": null
   },
   {
-    id: 10, brand: "contato", channel: "li",
-    date: "2026-10-03", sentiment: "neu",
-    snippet: "Lei 14.457 / CIPA: avaliando <mark>Contato Seguro</mark> como canal de denúncias. Alguém compara com alternativas no mesmo ticket?",
-    url: "https://www.linkedin.com/feed/update/urn:li:activity:illustrative-005",
-    likes: 74, comments: 18, shares: 5, reach: null
+    "id": 10,
+    "brand": "sienge",
+    "channel": "li",
+    "date": "2026-10-01",
+    "sentiment": "neu",
+    "snippet": "Reforma Tributária — Compras/Financeiro/Fiscal conectados",
+    "url": "https://br.linkedin.com/company/sienge",
+    "likes": 12,
+    "comments": null,
+    "shares": null,
+    "reach": null
   },
   {
-    id: 11, brand: "starian", channel: "ig",
-    date: "2026-10-06", sentiment: "pos",
-    snippet: "Floripa tech 🚀 Visita ao time <mark>Starian</mark> no Sapiens Parque. Ecossistemas SaaS de verdade.",
-    url: "https://www.instagram.com/p/illustrative-st-01/",
-    likes: 405, comments: 38, shares: 22, reach: 15200
+    "id": 11,
+    "brand": "contato",
+    "channel": "li",
+    "date": "2026-10-01",
+    "sentiment": "neu",
+    "snippet": "Helena Brochado — cultura de escuta no CONGREGARH (estande 33)",
+    "url": "https://br.linkedin.com/company/contatoseguro",
+    "likes": 24,
+    "comments": 2,
+    "shares": null,
+    "reach": null
   },
   {
-    id: 12, brand: "sienge", channel: "ig",
-    date: "2026-10-02", sentiment: "neg",
-    snippet: "Suporte ok, mas onboarding do <mark>Sienge</mark> pesou nas primeiras 2 semanas. Alguém tem playbook de go-live enxuto?",
-    url: "https://www.instagram.com/p/illustrative-sg-02/",
-    likes: 89, comments: 34, shares: 4, reach: 3100
+    "id": 12,
+    "brand": "contato",
+    "channel": "li",
+    "date": "2026-10-01",
+    "sentiment": "neu",
+    "snippet": "Photo dump CONGREGARH — palestra Liderança no Mundo Contemporâneo",
+    "url": "https://br.linkedin.com/company/contatoseguro",
+    "likes": 28,
+    "comments": 6,
+    "shares": null,
+    "reach": null
+  },
+  {
+    "id": 13,
+    "brand": "contato",
+    "channel": "li",
+    "date": "2026-10-01",
+    "sentiment": "neu",
+    "snippet": "CS News setembro — RH, Compliance e Proud Tech",
+    "url": "https://br.linkedin.com/company/contatoseguro",
+    "likes": 5,
+    "comments": null,
+    "shares": null,
+    "reach": null
+  },
+  {
+    "id": 14,
+    "brand": "starian",
+    "channel": "li",
+    "date": "2026-09-30",
+    "sentiment": "neu",
+    "snippet": "Hackathon IA Indústria da Construção — 19 equipes",
+    "url": "https://br.linkedin.com/company/somos-starian",
+    "likes": 38,
+    "comments": 5,
+    "shares": null,
+    "reach": null
+  },
+  {
+    "id": 15,
+    "brand": "sienge",
+    "channel": "li",
+    "date": "2026-09-30",
+    "sentiment": "neu",
+    "snippet": "Captação enfraquece antes do financiador — Sienge Capital (Lumma)",
+    "url": "https://br.linkedin.com/company/sienge",
+    "likes": 17,
+    "comments": 3,
+    "shares": null,
+    "reach": null
+  },
+  {
+    "id": 16,
+    "brand": "starian",
+    "channel": "li",
+    "date": "2026-09-29",
+    "sentiment": "neu",
+    "snippet": "Proud Tech Summit 2026 — TBT do evento",
+    "url": "https://br.linkedin.com/company/somos-starian",
+    "likes": 98,
+    "comments": null,
+    "shares": null,
+    "reach": null
+  },
+  {
+    "id": 17,
+    "brand": "starian",
+    "channel": "li",
+    "date": "2026-09-29",
+    "sentiment": "neu",
+    "snippet": "Starian Insights — o que continua humano na era dos agentes",
+    "url": "https://br.linkedin.com/company/somos-starian",
+    "likes": 24,
+    "comments": 4,
+    "shares": null,
+    "reach": null
+  },
+  {
+    "id": 18,
+    "brand": "projuris",
+    "channel": "li",
+    "date": "2026-09-29",
+    "sentiment": "neu",
+    "snippet": "Live: o que a operação está perdendo todo mês",
+    "url": "https://br.linkedin.com/company/projuris",
+    "likes": 12,
+    "comments": null,
+    "shares": null,
+    "reach": null
+  },
+  {
+    "id": 19,
+    "brand": "projuris",
+    "channel": "li",
+    "date": "2026-09-29",
+    "sentiment": "neu",
+    "snippet": "Live Agentes Autônomos Projuris IA — revisão 24x mais rápida",
+    "url": "https://br.linkedin.com/company/projuris",
+    "likes": 32,
+    "comments": null,
+    "shares": null,
+    "reach": null
+  },
+  {
+    "id": 20,
+    "brand": "projuris",
+    "channel": "li",
+    "date": "2026-09-29",
+    "sentiment": "neu",
+    "snippet": "Trecho live Jurídico iFood — dados entre plataformas",
+    "url": "https://br.linkedin.com/company/projuris",
+    "likes": 17,
+    "comments": null,
+    "shares": null,
+    "reach": null
+  },
+  {
+    "id": 21,
+    "brand": "projuris",
+    "channel": "li",
+    "date": "2026-09-29",
+    "sentiment": "neu",
+    "snippet": "Curso Projuris Educação — IA na advocacia (Graziela Bonfim)",
+    "url": "https://br.linkedin.com/company/projuris",
+    "likes": 11,
+    "comments": null,
+    "shares": null,
+    "reach": null
+  },
+  {
+    "id": 22,
+    "brand": "sienge",
+    "channel": "li",
+    "date": "2026-09-29",
+    "sentiment": "neu",
+    "snippet": "Preparação fiscal ≠ processo só para a Reforma",
+    "url": "https://br.linkedin.com/company/sienge",
+    "likes": 10,
+    "comments": 2,
+    "shares": null,
+    "reach": null
+  },
+  {
+    "id": 23,
+    "brand": "sienge",
+    "channel": "li",
+    "date": "2026-09-29",
+    "sentiment": "neu",
+    "snippet": "Constru_News #29 — El Niño, cronograma e gentrificação climática",
+    "url": "https://br.linkedin.com/company/sienge",
+    "likes": 14,
+    "comments": null,
+    "shares": null,
+    "reach": null
+  },
+  {
+    "id": 24,
+    "brand": "sienge",
+    "channel": "li",
+    "date": "2026-09-29",
+    "sentiment": "neu",
+    "snippet": "Crédito imobiliário +23% 1S26 — projeto pronto para capital?",
+    "url": "https://br.linkedin.com/company/sienge",
+    "likes": 14,
+    "comments": null,
+    "shares": null,
+    "reach": null
+  },
+  {
+    "id": 25,
+    "brand": "sienge",
+    "channel": "li",
+    "date": "2026-09-29",
+    "sentiment": "neu",
+    "snippet": "Repasse não começa no extrato — Gestão de Crédito Sienge",
+    "url": "https://br.linkedin.com/company/sienge",
+    "likes": 30,
+    "comments": null,
+    "shares": null,
+    "reach": null
+  },
+  {
+    "id": 26,
+    "brand": "contato",
+    "channel": "li",
+    "date": "2026-09-29",
+    "sentiment": "neu",
+    "snippet": "Destino CONGREGARH 2026 — estande 33 PUCRS",
+    "url": "https://br.linkedin.com/company/contatoseguro",
+    "likes": 8,
+    "comments": null,
+    "shares": null,
+    "reach": null
+  },
+  {
+    "id": 27,
+    "brand": "contato",
+    "channel": "li",
+    "date": "2026-09-29",
+    "sentiment": "neu",
+    "snippet": "TBT CONARH — saúde mental e escuta",
+    "url": "https://br.linkedin.com/company/contatoseguro",
+    "likes": 18,
+    "comments": 2,
+    "shares": null,
+    "reach": null
+  },
+  {
+    "id": 28,
+    "brand": "contato",
+    "channel": "li",
+    "date": "2026-09-29",
+    "sentiment": "neu",
+    "snippet": "Ouvidoria vs Canal de Denúncias — papéis distintos",
+    "url": "https://br.linkedin.com/company/contatoseguro",
+    "likes": 7,
+    "comments": null,
+    "shares": null,
+    "reach": null
+  },
+  {
+    "id": 29,
+    "brand": "contato",
+    "channel": "li",
+    "date": "2026-09-29",
+    "sentiment": "neu",
+    "snippet": "RH estratégico + Canal de Denúncias/Acolhimento",
+    "url": "https://br.linkedin.com/company/contatoseguro",
+    "likes": 9,
+    "comments": null,
+    "shares": null,
+    "reach": null
+  },
+  {
+    "id": 30,
+    "brand": "checklist",
+    "channel": "li",
+    "date": "2026-09-29",
+    "sentiment": "neu",
+    "snippet": "Notificações multicanais WhatsApp/Teams no Checklist Fácil",
+    "url": "https://br.linkedin.com/company/checklist-facil",
+    "likes": 4,
+    "comments": 1,
+    "shares": null,
+    "reach": null
+  },
+  {
+    "id": 31,
+    "brand": "checklist",
+    "channel": "li",
+    "date": "2026-09-29",
+    "sentiment": "neu",
+    "snippet": "Reconhecimento de imagem — até 60% menos tempo na inspeção",
+    "url": "https://br.linkedin.com/company/checklist-facil",
+    "likes": 2,
+    "comments": null,
+    "shares": null,
+    "reach": null
+  },
+  {
+    "id": 32,
+    "brand": "checklist",
+    "channel": "li",
+    "date": "2026-09-29",
+    "sentiment": "neu",
+    "snippet": "Newsletter #53 — ISO 9001:2026, IA e eSocial SST",
+    "url": "https://br.linkedin.com/company/checklist-facil",
+    "likes": 5,
+    "comments": null,
+    "shares": null,
+    "reach": null
+  },
+  {
+    "id": 33,
+    "brand": "checklist",
+    "channel": "li",
+    "date": "2026-09-29",
+    "sentiment": "neu",
+    "snippet": "Case Unimed Campinas — 45% menos PA em aberto, 50% menos tempo resposta",
+    "url": "https://br.linkedin.com/company/checklist-facil",
+    "likes": 6,
+    "comments": null,
+    "shares": null,
+    "reach": null
+  },
+  {
+    "id": 34,
+    "brand": "checklist",
+    "channel": "li",
+    "date": "2026-09-29",
+    "sentiment": "neu",
+    "snippet": "Revisão por amostragem vs IA que prioriza o que destoa",
+    "url": "https://br.linkedin.com/company/checklist-facil",
+    "likes": 7,
+    "comments": null,
+    "shares": null,
+    "reach": null
+  },
+  {
+    "id": 35,
+    "brand": "starian",
+    "channel": "li",
+    "date": "2026-09-22",
+    "sentiment": "neu",
+    "snippet": "Parabéns Sienge — Siena Melhor Assistente Virtual Troféu HDI 2026",
+    "url": "https://pt.linkedin.com/posts/somos-starian_trof%C3%A9u-hdi-2026-activity-7507874835427942401-Kigw",
+    "likes": 19,
+    "comments": null,
+    "shares": null,
+    "reach": null
+  },
+  {
+    "id": 36,
+    "brand": "projuris",
+    "channel": "li",
+    "date": "2026-09-22",
+    "sentiment": "neu",
+    "snippet": "Sincronização agenda Projuris ↔ Outlook Calendar",
+    "url": "https://br.linkedin.com/company/projuris",
+    "likes": 5,
+    "comments": null,
+    "shares": null,
+    "reach": null
+  },
+  {
+    "id": 37,
+    "brand": "projuris",
+    "channel": "li",
+    "date": "2026-09-22",
+    "sentiment": "neu",
+    "snippet": "Case Savegnago: 826 e-mails eliminados com Projuris Empresas",
+    "url": "https://br.linkedin.com/company/projuris",
+    "likes": 11,
+    "comments": null,
+    "shares": null,
+    "reach": null
+  },
+  {
+    "id": 38,
+    "brand": "sienge",
+    "channel": "li",
+    "date": "2026-09-22",
+    "sentiment": "neu",
+    "snippet": "Vender bem ≠ previsibilidade de caixa",
+    "url": "https://br.linkedin.com/company/sienge",
+    "likes": 14,
+    "comments": 2,
+    "shares": null,
+    "reach": null
+  },
+  {
+    "id": 39,
+    "brand": "sienge",
+    "channel": "li",
+    "date": "2026-09-22",
+    "sentiment": "neu",
+    "snippet": "Siena eleita Melhor Assistente Virtual de Suporte — Troféu HDI 2026",
+    "url": "https://www.linkedin.com/feed/update/urn:li:activity:7507812483865231361",
+    "likes": 68,
+    "comments": 12,
+    "shares": null,
+    "reach": null
+  },
+  {
+    "id": 40,
+    "brand": "contato",
+    "channel": "li",
+    "date": "2026-09-22",
+    "sentiment": "neu",
+    "snippet": "Suspensão multas NR-1 acabando — empresa preparada?",
+    "url": "https://br.linkedin.com/company/contatoseguro",
+    "likes": 17,
+    "comments": null,
+    "shares": null,
+    "reach": null
+  },
+  {
+    "id": 41,
+    "brand": "checklist",
+    "channel": "li",
+    "date": "2026-09-22",
+    "sentiment": "neu",
+    "snippet": "CNI: 74% compraram máquinas, 5% investiram Indústria 4.0",
+    "url": "https://br.linkedin.com/company/checklist-facil",
+    "likes": 6,
+    "comments": null,
+    "shares": null,
+    "reach": null
+  },
+  {
+    "id": 42,
+    "brand": "checklist",
+    "channel": "li",
+    "date": "2026-09-22",
+    "sentiment": "neu",
+    "snippet": "Ciclo da NC quebra na atribuição/prazo/evidência",
+    "url": "https://br.linkedin.com/company/checklist-facil",
+    "likes": 4,
+    "comments": 1,
+    "shares": null,
+    "reach": null
+  },
+  {
+    "id": 43,
+    "brand": "checklist",
+    "channel": "li",
+    "date": "2026-09-22",
+    "sentiment": "neu",
+    "snippet": "Gartner: 1 em 3 apps corporativos com agentes IA até 2028",
+    "url": "https://br.linkedin.com/company/checklist-facil",
+    "likes": 4,
+    "comments": 1,
+    "shares": null,
+    "reach": null
+  },
+  {
+    "id": 44,
+    "brand": "sienge",
+    "channel": "press",
+    "date": "2026-09-16",
+    "sentiment": "neu",
+    "snippet": "Finalistas Troféu HDI 2026 — Siena (Starian/Sienge) em Melhor Assistente Virtual · HDI Experience",
+    "url": "https://hdiexperience.com.br/trofeu-hdi-2026/finalistas-trofeu-hdi-2026",
+    "likes": null,
+    "comments": null,
+    "shares": null,
+    "reach": null
+  },
+  {
+    "id": 45,
+    "brand": "starian",
+    "channel": "press",
+    "date": "2026-09-16",
+    "sentiment": "neu",
+    "snippet": "Sem M&As em 2026, Starian reforça tese de verticalização · Startups",
+    "url": "https://startups.com.br/negocios/ma/com-pausa-nos-mas-starian-foca-na-verticalizacao/",
+    "likes": null,
+    "comments": null,
+    "shares": null,
+    "reach": null
+  },
+  {
+    "id": 46,
+    "brand": "projuris",
+    "channel": "li",
+    "date": "2026-09-15",
+    "sentiment": "neu",
+    "snippet": "Projuris Summit — tarefas robotizáveis (Iago Capistrano)",
+    "url": "https://br.linkedin.com/company/projuris",
+    "likes": 12,
+    "comments": null,
+    "shares": null,
+    "reach": null
+  },
+  {
+    "id": 47,
+    "brand": "projuris",
+    "channel": "li",
+    "date": "2026-09-15",
+    "sentiment": "neu",
+    "snippet": "Live: como o Jurídico do iFood virou parceiro estratégico",
+    "url": "https://br.linkedin.com/company/projuris",
+    "likes": 16,
+    "comments": 2,
+    "shares": null,
+    "reach": null
+  },
+  {
+    "id": 48,
+    "brand": "checklist",
+    "channel": "li",
+    "date": "2026-09-15",
+    "sentiment": "neu",
+    "snippet": "Case TSEA Energy — 90% mais produtividade com Checklist Fácil",
+    "url": "https://br.linkedin.com/company/checklist-facil",
+    "likes": 3,
+    "comments": null,
+    "shares": null,
+    "reach": null
+  },
+  {
+    "id": 49,
+    "brand": "starian",
+    "channel": "press",
+    "date": "2026-06-23",
+    "sentiment": "neu",
+    "snippet": "Com um ano, Starian projeta R$ 750 mi em receita e mantém estratégia de M&As · InfoMoney",
+    "url": "https://www.infomoney.com.br/business/com-um-ano-starian-projeta-r-750-mi-em-receita-e-mantem-estrategia-de-mas/",
+    "likes": null,
+    "comments": null,
+    "shares": null,
+    "reach": null
+  },
+  {
+    "id": 50,
+    "brand": "starian",
+    "channel": "press",
+    "date": "2026-05-19",
+    "sentiment": "neu",
+    "snippet": "Starian faz evento sobre governança em parceria com a B3 e Acate · NSC Total",
+    "url": "https://www.nsctotal.com.br/colunista/estela-benetti/starian-faz-evento-sobre-governanca-em-parceria-com-a-b3-e-acate",
+    "likes": null,
+    "comments": null,
+    "shares": null,
+    "reach": null
+  },
+  {
+    "id": 51,
+    "brand": "projuris",
+    "channel": "press",
+    "date": "2025-12-29",
+    "sentiment": "neu",
+    "snippet": "Resumo do Processo: agilidade e controle na gestão processual · Projuris Blog",
+    "url": "https://www.projuris.com.br/blog/resumo-do-processo-novidade/",
+    "likes": null,
+    "comments": null,
+    "shares": null,
+    "reach": null
+  },
+  {
+    "id": 52,
+    "brand": "starian",
+    "channel": "press",
+    "date": "2025-12-03",
+    "sentiment": "neu",
+    "snippet": "Starian, da Softplan, segue expansão e compra Contato Seguro · Startups",
+    "url": "https://startups.com.br/negocios/ma/starian-da-softplan-segue-expansao-e-compra-contato-seguro/",
+    "likes": null,
+    "comments": null,
+    "shares": null,
+    "reach": null
+  },
+  {
+    "id": 53,
+    "brand": "starian",
+    "channel": "press",
+    "date": "2025-12-03",
+    "sentiment": "neu",
+    "snippet": "Starian adquire Contato Seguro e lança nova vertical com foco em compliance · Starian (release)",
+    "url": "https://starian.com.br/releases/starian-adquire-contato-seguro-e-lanca-nova-vertical-com-foco-em-compliance/",
+    "likes": null,
+    "comments": null,
+    "shares": null,
+    "reach": null
+  },
+  {
+    "id": 54,
+    "brand": "contato",
+    "channel": "press",
+    "date": "2025-12-03",
+    "sentiment": "neu",
+    "snippet": "Starian adquire Contato Seguro e cria vertical de compliance · VEJA",
+    "url": "https://veja.abril.com.br/coluna/radar-economico/starian-adquire-contato-seguro-e-cria-vertical-de-compliance/",
+    "likes": null,
+    "comments": null,
+    "shares": null,
+    "reach": null
+  },
+  {
+    "id": 55,
+    "brand": "contato",
+    "channel": "press",
+    "date": "2025-12-03",
+    "sentiment": "neu",
+    "snippet": "Starian, da Softplan, segue expansão e compra Contato Seguro · Startups",
+    "url": "https://startups.com.br/negocios/ma/starian-da-softplan-segue-expansao-e-compra-contato-seguro/",
+    "likes": null,
+    "comments": null,
+    "shares": null,
+    "reach": null
+  },
+  {
+    "id": 56,
+    "brand": "starian",
+    "channel": "press",
+    "date": "2025-12-03",
+    "sentiment": "neu",
+    "snippet": "Maior empresa de tecnologia de Floripa vai às compras no RS rumo ao R$ 1 bi · Exame",
+    "url": "https://exame.com/negocios/softplan-starian-aquisicao-contato-seguro/",
+    "likes": null,
+    "comments": null,
+    "shares": null,
+    "reach": null
+  },
+  {
+    "id": 57,
+    "brand": "contato",
+    "channel": "press",
+    "date": "2025-12-03",
+    "sentiment": "neu",
+    "snippet": "Starian adquire Contato Seguro — vertical de governança e compliance · Exame",
+    "url": "https://exame.com/negocios/softplan-starian-aquisicao-contato-seguro/",
+    "likes": null,
+    "comments": null,
+    "shares": null,
+    "reach": null
+  },
+  {
+    "id": 58,
+    "brand": "projuris",
+    "channel": "press",
+    "date": "2025-09-18",
+    "sentiment": "neu",
+    "snippet": "Inteligência Artificial no Projuris Empresas: funcionalidades e cuidados jurídicos · Projuris Blog",
+    "url": "https://www.projuris.com.br/blog/funcionalidades-ia-empresas-novidade/",
+    "likes": null,
+    "comments": null,
+    "shares": null,
+    "reach": null
+  },
+  {
+    "id": 59,
+    "brand": "sienge",
+    "channel": "press",
+    "date": "2025-09-12",
+    "sentiment": "neu",
+    "snippet": "Sienge lança assessoria de crédito para construtoras · Portas",
+    "url": "https://portas.com.br/noticias/sienge-lanca-assessoria-de-credito-para-construtoras/",
+    "likes": null,
+    "comments": null,
+    "shares": null,
+    "reach": null
+  },
+  {
+    "id": 60,
+    "brand": "sienge",
+    "channel": "press",
+    "date": "2025-09-02",
+    "sentiment": "neu",
+    "snippet": "À margem da Faria Lima: o plano do Sienge para reforçar o funding de incorporadoras · Bloomberg Línea",
+    "url": "https://www.bloomberglinea.com.br/negocios/a-margem-da-faria-lima-o-plano-do-sienge-para-reforcar-o-funding-de-incorporadoras/",
+    "likes": null,
+    "comments": null,
+    "shares": null,
+    "reach": null
   }
 ];
 
@@ -448,6 +1146,13 @@ function fmtDate(iso) {
   const [y,m,d] = iso.split("-");
   return `${d}/${m}/${y}`;
 }
+function markBrand(text, brandKey) {
+  const name = LABELS[brandKey];
+  if (!name) return text.replace(/</g,"&lt;");
+  const esc = text.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  const re = new RegExp(name.replace(/[.*+?^${}()|[\]\\]/g,"\\$&"), "ig");
+  return esc.replace(re, m => "<mark>"+m+"</mark>");
+}
 
 function render() {
   const feed = document.getElementById("feed");
@@ -461,10 +1166,10 @@ function render() {
         <div class="card-head">
           <span class="pill ${CHAN_CLASS[item.channel]}">${CHAN[item.channel]}</span>
           <span class="marca">${LABELS[item.brand]}</span>
-          <span class="sent ${item.sentiment}">${item.sentiment === "pos" ? "pos" : item.sentiment === "neg" ? "neg" : "neu"}</span>
+          <span class="sent neu">real</span>
           <span class="when">${fmtDate(item.date)}</span>
         </div>
-        <p class="snippet">${item.snippet}</p>
+        <p class="snippet">${markBrand(item.snippet, item.brand)}</p>
         <div class="metrics">
           <div class="metric"><label>Likes (post)</label><b>${likes ?? '<span class="na">—</span>'}</b></div>
           <div class="metric"><label>Comentários</label><b>${comments ?? '<span class="na">—</span>'}</b></div>
@@ -475,7 +1180,6 @@ function render() {
       </article>`;
   }).join("");
 
-  // counts
   const byBrand = {};
   let li=0, ig=0, press=0, engSum=0, engN=0;
   DATA.forEach(d => {
