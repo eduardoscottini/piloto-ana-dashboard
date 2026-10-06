@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Piloto · Monitoramento de posts (dados reais · Apify LI+IG)</title>
+<title>Piloto · Monitoramento de posts (LI · IG · News)</title>
 <style>
   :root {
     --bg: #0b0d12;
@@ -274,6 +274,77 @@
     color: var(--muted);
     background: rgba(255,255,255,0.02);
   }
+
+  .filters-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .filters-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+  }
+  .source-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .chip {
+    border: 1px solid var(--border);
+    background: var(--bg2);
+    color: var(--muted);
+    font: inherit;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 6px 12px;
+    border-radius: 999px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: 0.15s;
+    opacity: 0.45;
+  }
+  .chip:hover { color: var(--text); border-color: #3a4152; }
+  .chip.active {
+    opacity: 1;
+    color: var(--text);
+    background: var(--panel);
+    box-shadow: 0 0 0 1px var(--border);
+  }
+  .chip.active[data-channel="li"] { box-shadow: 0 0 0 1px rgba(10,102,194,0.45); }
+  .chip.active[data-channel="ig"] { box-shadow: 0 0 0 1px rgba(225,48,108,0.45); }
+  .chip.active[data-channel="press"] { box-shadow: 0 0 0 1px rgba(34,197,94,0.45); }
+  .chip .count {
+    font-size: 11px;
+    color: var(--muted);
+    background: var(--bg);
+    padding: 1px 6px;
+    border-radius: 999px;
+  }
+  .chip.active .count { color: var(--accent); }
+  .chan.clickable {
+    cursor: pointer;
+    transition: 0.15s;
+    opacity: 0.45;
+  }
+  .chan.clickable:hover { border-color: #3a4152; }
+  .chan.clickable.active {
+    opacity: 1;
+    border-color: #3a4152;
+  }
+  .empty-feed {
+    padding: 28px 18px;
+    text-align: center;
+    color: var(--muted);
+    font-size: 13px;
+    border: 1px dashed var(--border);
+    border-radius: var(--radius);
+  }
 </style>
 </head>
 <body>
@@ -289,9 +360,9 @@
 
     <div class="aside-block">
       <h2>Por canal</h2>
-      <div class="chan"><span><span class="dot li"></span>LinkedIn</span><strong id="c-li">0</strong></div>
-      <div class="chan"><span><span class="dot ig"></span>Instagram</span><strong id="c-ig">0</strong></div>
-      <div class="chan"><span><span class="dot press"></span>Imprensa</span><strong id="c-press">0</strong></div>
+      <div class="chan clickable active" data-channel="li" role="button" tabindex="0"><span><span class="dot li"></span>LinkedIn</span><strong id="c-li">0</strong></div>
+      <div class="chan clickable active" data-channel="ig" role="button" tabindex="0"><span><span class="dot ig"></span>Instagram</span><strong id="c-ig">0</strong></div>
+      <div class="chan clickable active" data-channel="press" role="button" tabindex="0"><span><span class="dot press"></span>Imprensa</span><strong id="c-press">0</strong></div>
     </div>
 
     <div class="aside-block">
@@ -313,9 +384,9 @@
     <div class="top">
       <div>
         <h2>Menções com métrica do post</h2>
-        <p class="sub">LinkedIn (páginas públicas das marcas) · Instagram (gap) · Imprensa digital</p>
+        <p class="sub">LinkedIn · Instagram · Imprensa digital — filtros de marca e fonte combináveis</p>
       </div>
-      <span class="badge">Coleta real · 60 itens · 0 IG</span>
+      <span class="badge" id="badge-coleta">Coleta real</span>
     </div>
 
     <div class="tabs" role="tablist">
@@ -327,19 +398,27 @@
       <button class="tab" data-brand="contato">Contato Seguro <span class="count" id="t-contato">0</span></button>
     </div>
 
-    <div class="legend">
-      <i><span class="pill li">LI</span> LinkedIn — posts públicos (métrica do post)</i>
-      <i><span class="pill ig">IG</span> Instagram — sem token Apify (0 nesta coleta)</i>
-      <i><span class="pill press">News</span> Imprensa digital</i>
+    <div class="filters-row">
+      <span class="filters-label">Fonte</span>
+      <div class="source-chips" role="group" aria-label="Filtrar por fonte">
+        <button type="button" class="chip active" data-channel="li" title="Toggle LinkedIn">
+          <span class="pill li">LI</span> LinkedIn <span class="count" id="f-li">0</span>
+        </button>
+        <button type="button" class="chip active" data-channel="ig" title="Toggle Instagram">
+          <span class="pill ig">IG</span> Instagram <span class="count" id="f-ig">0</span>
+        </button>
+        <button type="button" class="chip active" data-channel="press" title="Toggle News/Imprensa">
+          <span class="pill press">News</span> Imprensa <span class="count" id="f-press">0</span>
+        </button>
+      </div>
     </div>
 
     <div class="feed" id="feed"></div>
 
     <footer class="note">
-      Coleta real (2026-10-06 20:59 UTC). Métricas de post vindas da UI pública do LinkedIn (likes/comentários quando visíveis). Shares e alcance = null quando não públicos.
-      Instagram: 0 — sem APIFY_API_TOKEN; Google News RSS + páginas canônicas para imprensa.
-      LinkedIn keyword de terceiros (sem @) ainda depende de Apify/scraper dedicado — nesta rodada: posts das páginas oficiais das 5 marcas.
-      Sem TV/rádio. Nenhuma métrica inventada.
+      Coleta real (2026-10-06 · BRT). Dados Apify LI + IG + imprensa (Google News / páginas canônicas).
+      Métricas de post quando públicas (likes/comentários); shares e alcance = — quando não disponíveis.
+      Filtros de marca e fonte são combináveis (AND). Sem TV/rádio. Nenhuma menção inventada.
     </footer>
   </main>
 </div>
@@ -2632,26 +2711,46 @@ const LABELS = {
 };
 const CHAN = { li: "LI", ig: "IG", press: "News" };
 const CHAN_CLASS = { li: "li", ig: "ig", press: "press" };
+const ALL_CHANNELS = ["li", "ig", "press"];
+
+let activeBrand = "all";
+let activeChannels = new Set(ALL_CHANNELS);
 
 function fmt(n) {
   if (n == null) return null;
   return n.toLocaleString("pt-BR");
 }
 function fmtDate(iso) {
-  const [y,m,d] = iso.split("-");
+  if (!iso) return "—";
+  const day = iso.slice(0, 10);
+  const [y,m,d] = day.split("-");
   return `${d}/${m}/${y}`;
 }
 function markBrand(text, brandKey) {
   const name = LABELS[brandKey];
-  if (!name) return text.replace(/</g,"&lt;");
-  const esc = text.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  const esc = String(text || "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  if (!name) return esc;
   const re = new RegExp(name.replace(/[.*+?^${}()|[\]\\]/g,"\\$&"), "ig");
   return esc.replace(re, m => "<mark>"+m+"</mark>");
 }
 
-function render() {
+function matchesBrand(item) {
+  return activeBrand === "all" || item.brand === activeBrand;
+}
+function matchesChannel(item) {
+  return activeChannels.has(item.channel);
+}
+function filtered() {
+  return DATA.filter(d => matchesBrand(d) && matchesChannel(d));
+}
+
+function renderCards(items) {
   const feed = document.getElementById("feed");
-  feed.innerHTML = DATA.map(item => {
+  if (!items.length) {
+    feed.innerHTML = '<div class="empty-feed">Nenhuma menção com os filtros atuais. Ative ao menos uma fonte ou escolha outra marca.</div>';
+    return;
+  }
+  feed.innerHTML = items.map(item => {
     const likes = fmt(item.likes);
     const comments = fmt(item.comments);
     const shares = fmt(item.shares);
@@ -2660,7 +2759,7 @@ function render() {
       <article class="card" data-brand="${item.brand}" data-channel="${item.channel}">
         <div class="card-head">
           <span class="pill ${CHAN_CLASS[item.channel]}">${CHAN[item.channel]}</span>
-          <span class="marca">${LABELS[item.brand]}</span>
+          <span class="marca">${LABELS[item.brand] || item.brand}</span>
           <span class="sent neu">real</span>
           <span class="when">${fmtDate(item.date)}</span>
         </div>
@@ -2674,45 +2773,106 @@ function render() {
         <a class="source-link" href="${item.url}" target="_blank" rel="noopener">Abrir fonte ↗</a>
       </article>`;
   }).join("");
+}
 
-  const byBrand = {};
-  let li=0, ig=0, press=0, engSum=0, engN=0;
+function updateCounts() {
+  // Channel counts respect brand filter (not channel filter) so chips show available volume
+  const byBrandChannel = {};
+  const byChannelForBrand = { li: 0, ig: 0, press: 0 };
+  const byBrandForChannels = {};
+  let liAll = 0, igAll = 0, pressAll = 0;
+
   DATA.forEach(d => {
-    byBrand[d.brand] = (byBrand[d.brand] || 0) + 1;
-    if (d.channel === "li") li++;
-    if (d.channel === "ig") ig++;
-    if (d.channel === "press") press++;
+    if (d.channel === "li") liAll++;
+    else if (d.channel === "ig") igAll++;
+    else if (d.channel === "press") pressAll++;
+
+    if (matchesBrand(d)) {
+      byChannelForBrand[d.channel] = (byChannelForBrand[d.channel] || 0) + 1;
+    }
+    if (matchesChannel(d)) {
+      byBrandForChannels[d.brand] = (byBrandForChannels[d.brand] || 0) + 1;
+    }
+  });
+
+  const items = filtered();
+  let engSum = 0, engN = 0;
+  items.forEach(d => {
     if (d.likes != null) {
-      engSum += d.likes + (d.comments||0) + (d.shares||0);
+      engSum += d.likes + (d.comments || 0) + (d.shares || 0);
       engN++;
     }
   });
-  document.getElementById("c-li").textContent = li;
-  document.getElementById("c-ig").textContent = ig;
-  document.getElementById("c-press").textContent = press;
-  document.getElementById("c-total").textContent = DATA.length;
-  document.getElementById("c-eng").textContent = engN ? Math.round(engSum/engN).toLocaleString("pt-BR") : "—";
-  document.getElementById("t-all").textContent = DATA.length;
+
+  document.getElementById("c-li").textContent = byChannelForBrand.li || 0;
+  document.getElementById("c-ig").textContent = byChannelForBrand.ig || 0;
+  document.getElementById("c-press").textContent = byChannelForBrand.press || 0;
+  document.getElementById("f-li").textContent = byChannelForBrand.li || 0;
+  document.getElementById("f-ig").textContent = byChannelForBrand.ig || 0;
+  document.getElementById("f-press").textContent = byChannelForBrand.press || 0;
+
+  document.getElementById("c-total").textContent = items.length;
+  document.getElementById("c-eng").textContent = engN ? Math.round(engSum / engN).toLocaleString("pt-BR") : "—";
+
+  const brandTotal = Object.values(byBrandForChannels).reduce((a, b) => a + b, 0);
+  document.getElementById("t-all").textContent = brandTotal;
   Object.keys(LABELS).forEach(k => {
-    document.getElementById("t-" + k).textContent = byBrand[k] || 0;
+    document.getElementById("t-" + k).textContent = byBrandForChannels[k] || 0;
+  });
+
+  const badge = document.getElementById("badge-coleta");
+  if (badge) {
+    badge.textContent = `Coleta real · ${DATA.length} itens · ${igAll} IG · ${liAll} LI · ${pressAll} News`;
+  }
+}
+
+function syncChannelUI() {
+  document.querySelectorAll(".chip[data-channel], .chan.clickable[data-channel]").forEach(el => {
+    el.classList.toggle("active", activeChannels.has(el.dataset.channel));
   });
 }
 
-function filter(brand) {
-  document.querySelectorAll(".card").forEach(card => {
-    card.classList.toggle("hidden", brand !== "all" && card.dataset.brand !== brand);
-  });
+function applyFilters() {
+  syncChannelUI();
+  renderCards(filtered());
+  updateCounts();
+}
+
+function toggleChannel(ch) {
+  if (!ALL_CHANNELS.includes(ch)) return;
+  if (activeChannels.has(ch)) {
+    if (activeChannels.size === 1) return; // keep at least one source on
+    activeChannels.delete(ch);
+  } else {
+    activeChannels.add(ch);
+  }
+  applyFilters();
 }
 
 document.querySelectorAll(".tab").forEach(tab => {
   tab.addEventListener("click", () => {
     document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
     tab.classList.add("active");
-    filter(tab.dataset.brand);
+    activeBrand = tab.dataset.brand;
+    applyFilters();
   });
 });
 
-render();
+document.querySelectorAll(".chip[data-channel]").forEach(chip => {
+  chip.addEventListener("click", () => toggleChannel(chip.dataset.channel));
+});
+
+document.querySelectorAll(".chan.clickable[data-channel]").forEach(el => {
+  el.addEventListener("click", () => toggleChannel(el.dataset.channel));
+  el.addEventListener("keydown", e => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      toggleChannel(el.dataset.channel);
+    }
+  });
+});
+
+applyFilters();
 </script>
 </body>
 </html>
