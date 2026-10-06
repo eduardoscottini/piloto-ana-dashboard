@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Piloto · Monitoramento de posts</title>
+<style>
+  :root {
+    --bg: #0b0d12;
+    --bg2: #12151c;
+    --panel: #161a22;
+    --border: #262b36;
+    --text: #e8eaef;
+    --muted: #8b93a7;
+    --accent: #6c8cff;
+    --li: #0a66c2;
+    --ig: #e1306c;
+    --press: #22c55e;
+    --pos: #34d399;
+    --neu: #94a3b8;
+    --neg: #f87171;
+    --radius: 12px;
+    --font: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: var(--font);
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    line-height: 1.45;
+  }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  .shell {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    min-height: 100vh;
+  }
+  @media (max-width: 860px) {
+    .shell { grid-template-columns: 1fr; }
+    aside { border-right: none !important; border-bottom: 1px solid var(--border); }
+  }
+
+  aside {
+    background: var(--bg2);
+    border-right: 1px solid var(--border);
+    padding: 24px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .logo {
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #6c8cff, #a78bfa);
+    display: grid; place-items: center;
+    font-weight: 700; font-size: 13px; color: #fff;
+  }
+  .brand h1 { font-size: 14px; font-weight: 600; letter-spacing: -0.01em; }
+  .brand p { font-size: 11px; color: var(--muted); }
+
+  .aside-block h2 {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+    margin-bottom: 12px;
+  }
+  .chan {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 12px;
+    border-radius: 8px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    margin-bottom: 8px;
+    font-size: 13px;
+  }
+  .chan .dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    display: inline-block; margin-right: 8px;
+  }
+  .dot.li { background: var(--li); }
+  .dot.ig { background: var(--ig); }
+  .dot.press { background: var(--press); }
+  .chan strong { font-variant-numeric: tabular-nums; }
+
+  .kpis {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .kpi {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px;
+  }
+  .kpi span { display: block; font-size: 11px; color: var(--muted); }
+  .kpi b { font-size: 20px; font-variant-numeric: tabular-nums; }
+
+  main { padding: 24px 28px 48px; max-width: 1100px; }
+
+  .top {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 22px;
+  }
+  .top h2 { font-size: 22px; font-weight: 650; letter-spacing: -0.02em; }
+  .top .sub { color: var(--muted); font-size: 13px; margin-top: 4px; }
+  .badge {
+    font-size: 11px;
+    padding: 6px 10px;
+    border-radius: 999px;
+    background: rgba(108,140,255,0.12);
+    color: var(--accent);
+    border: 1px solid rgba(108,140,255,0.25);
+    white-space: nowrap;
+  }
+
+  .tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 20px;
+    padding: 4px;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    width: fit-content;
+    max-width: 100%;
+  }
+  .tab {
+    border: none;
+    background: transparent;
+    color: var(--muted);
+    font: inherit;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 8px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.15s;
+  }
+  .tab:hover { color: var(--text); }
+  .tab.active {
+    background: var(--panel);
+    color: var(--text);
+    box-shadow: 0 0 0 1px var(--border);
+  }
+  .tab .count {
+    display: inline-block;
+    margin-left: 6px;
+    font-size: 11px;
+    color: var(--muted);
+    background: var(--bg);
+    padding: 1px 6px;
+    border-radius: 999px;
+  }
+  .tab.active .count { color: var(--accent); }
+
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 16px;
+  }
+  .legend i {
+    font-style: normal;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .pill {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding: 3px 7px;
+    border-radius: 6px;
+  }
+  .pill.li { background: rgba(10,102,194,0.2); color: #7eb6f6; }
+  .pill.ig { background: rgba(225,48,108,0.2); color: #f472b6; }
+  .pill.press { background: rgba(34,197,94,0.15); color: #4ade80; }
+
+  .feed { display: flex; flex-direction: column; gap: 12px; }
+
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 18px;
+    transition: border-color 0.15s;
+  }
+  .card:hover { border-color: #3a4152; }
+  .card.hidden { display: none; }
+
+  .card-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 12px;
+    margin-bottom: 10px;
+  }
+  .card-head .marca {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .card-head .when {
+    margin-left: auto;
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .sent {
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: 600;
+  }
+  .sent.pos { background: rgba(52,211,153,0.15); color: var(--pos); }
+  .sent.neu { background: rgba(148,163,184,0.15); color: var(--neu); }
+  .sent.neg { background: rgba(248,113,113,0.15); color: var(--neg); }
+
+  .snippet {
+    font-size: 14px;
+    color: #c8cdd8;
+    margin-bottom: 14px;
+  }
+  .snippet mark {
+    background: rgba(108,140,255,0.22);
+    color: #fff;
+    padding: 0 2px;
+    border-radius: 3px;
+  }
+
+  .metrics {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 18px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+    font-size: 12px;
+  }
+  .metric {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .metric label { color: var(--muted); font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .metric b { font-variant-numeric: tabular-nums; font-size: 14px; }
+  .metric .na { color: var(--muted); font-weight: 500; }
+  .source-link { font-size: 12px; margin-top: 10px; display: inline-block; }
+
+  footer.note {
+    margin-top: 36px;
+    padding: 14px 16px;
+    border-radius: 8px;
+    border: 1px dashed var(--border);
+    font-size: 12px;
+    color: var(--muted);
+    background: rgba(255,255,255,0.02);
+  }
+</style>
+</head>
+<body>
+<div class="shell">
+  <aside>
+    <div class="brand">
+      <div class="logo">M</div>
+      <div>
+        <h1>Monitor Posts</h1>
+        <p>Piloto · 14 dias</p>
+      </div>
+    </div>
+
+    <div class="aside-block">
+      <h2>Por canal</h2>
+      <div class="chan"><span><span class="dot li"></span>LinkedIn</span><strong id="c-li">0</strong></div>
+      <div class="chan"><span><span class="dot ig"></span>Instagram</span><strong id="c-ig">0</strong></div>
+      <div class="chan"><span><span class="dot press"></span>Imprensa</span><strong id="c-press">0</strong></div>
+    </div>
+
+    <div class="aside-block">
+      <h2>Período</h2>
+      <div class="kpis">
+        <div class="kpi"><span>Menções</span><b id="c-total">0</b></div>
+        <div class="kpi"><span>Engaj. médio*</span><b id="c-eng">—</b></div>
+      </div>
+      <p style="font-size:10px;color:var(--muted);margin-top:8px">* likes + comments + shares (posts com métrica)</p>
+    </div>
+
+    <div class="aside-block" style="margin-top:auto">
+      <h2>Alerta WhatsApp</h2>
+      <p style="font-size:12px;color:var(--muted)">Diário · 09:00 BRT<br/>Top 3 por engajamento + links</p>
+    </div>
+  </aside>
+
+  <main>
+    <div class="top">
+      <div>
+        <h2>Menções com métrica do post</h2>
+        <p class="sub">LinkedIn keyword (sem depender de @) · Instagram · Imprensa digital</p>
+      </div>
+      <span class="badge">Dados ilustrativos · não são live</span>
+    </div>
+
+    <div class="tabs" role="tablist">
+      <button class="tab active" data-brand="all">Todas <span class="count" id="t-all">0</span></button>
+      <button class="tab" data-brand="starian">Starian <span class="count" id="t-starian">0</span></button>
+      <button class="tab" data-brand="checklist">Checklist Fácil <span class="count" id="t-checklist">0</span></button>
+      <button class="tab" data-brand="projuris">Projuris <span class="count" id="t-projuris">0</span></button>
+      <button class="tab" data-brand="sienge">Sienge <span class="count" id="t-sienge">0</span></button>
+      <button class="tab" data-brand="contato">Contato Seguro <span class="count" id="t-contato">0</span></button>
+    </div>
+
+    <div class="legend">
+      <i><span class="pill li">LI</span> LinkedIn — busca por keyword</i>
+      <i><span class="pill ig">IG</span> Instagram — interação do post</i>
+      <i><span class="pill press">News</span> Imprensa digital</i>
+    </div>
+
+    <div class="feed" id="feed"></div>
+
+    <footer class="note">
+      Rascunho piloto — dados ilustrativos. Métricas de post (likes, comentários, shares) são placeholders realistas para validar o layout com Ana.
+      Alcance do post aparece só quando a fonte entregar; caso contrário, “—”. Sem TV/rádio. Knewin continua referência de imprensa; este piloto foca o buraco do social.
+    </footer>
+  </main>
+</div>
+
+<script>
+const DATA = [
+  {
+    id: 1, brand: "starian", channel: "li",
+    date: "2026-10-05", sentiment: "pos",
+    snippet: "Acompanhei o movimento da <mark>Starian</mark> pós-cisão Softplan — foco em SaaS privado com Sienge, Projuris e Checklist Fácil no mesmo guarda-chuva. Vale olhar o play de M&A.",
+    url: "https://www.linkedin.com/feed/update/urn:li:activity:illustrative-001",
+    likes: 184, comments: 27, shares: 19, reach: 12400
+  },
+  {
+    id: 2, brand: "starian", channel: "press",
+    date: "2026-10-04", sentiment: "pos",
+    snippet: "General Atlantic aporta na <mark>Starian</mark>, spin-off privado da Softplan voltado a construção, legal tech e eficiência operacional.",
+    url: "https://example-news.com/starian-general-atlantic",
+    likes: null, comments: null, shares: null, reach: null
+  },
+  {
+    id: 3, brand: "checklist", channel: "ig",
+    date: "2026-10-05", sentiment: "pos",
+    snippet: "Auditoria de loja sem papel ✨ Usamos <mark>Checklist Fácil</mark> no celular — foto, GPS e plano de ação no mesmo fluxo. #ChecklistFácil",
+    url: "https://www.instagram.com/p/illustrative-cf-01/",
+    likes: 312, comments: 41, shares: 18, reach: 8900
+  },
+  {
+    id: 4, brand: "checklist", channel: "li",
+    date: "2026-10-03", sentiment: "neu",
+    snippet: "Alguém tem experiência com <mark>Checklist Fácil</mark> vs planilha + Forms para inspeção de obra? Preciso padronizar FVS em 12 canteiros.",
+    url: "https://www.linkedin.com/feed/update/urn:li:activity:illustrative-002",
+    likes: 56, comments: 14, shares: 3, reach: null
+  },
+  {
+    id: 5, brand: "projuris", channel: "li",
+    date: "2026-10-06", sentiment: "pos",
+    snippet: "Contratos e contencioso no mesmo lugar: migrando o jurídico corporativo para <mark>Projuris</mark> Empresas. SLA de análise caiu bastante no piloto.",
+    url: "https://www.linkedin.com/feed/update/urn:li:activity:illustrative-003",
+    likes: 97, comments: 22, shares: 11, reach: 6100
+  },
+  {
+    id: 6, brand: "projuris", channel: "ig",
+    date: "2026-10-02", sentiment: "pos",
+    snippet: "Legal ops na prática ⚖️ Bastidores do time usando <mark>Projuris</mark> no dia a dia. #LegalTech #Projuris",
+    url: "https://www.instagram.com/p/illustrative-pj-01/",
+    likes: 228, comments: 19, shares: 9, reach: 5400
+  },
+  {
+    id: 7, brand: "sienge", channel: "li",
+    date: "2026-10-05", sentiment: "pos",
+    snippet: "Construtora mid-market: fechamos o mês com medições e compras no <mark>Sienge</mark>. Integração com Checklist Fácil salvou a vistoria de entrega.",
+    url: "https://www.linkedin.com/feed/update/urn:li:activity:illustrative-004",
+    likes: 143, comments: 31, shares: 16, reach: 9800
+  },
+  {
+    id: 8, brand: "sienge", channel: "press",
+    date: "2026-10-01", sentiment: "neu",
+    snippet: "Ecossistema <mark>Sienge</mark> segue como âncora da vertical de construção da Starian no mercado privado brasileiro.",
+    url: "https://example-news.com/sienge-ecossistema",
+    likes: null, comments: null, shares: null, reach: null
+  },
+  {
+    id: 9, brand: "contato", channel: "ig",
+    date: "2026-10-04", sentiment: "pos",
+    snippet: "Canal de ética ativo 🔒 Implementamos <mark>Contato Seguro</mark> — denúncia anônima e trilha de compliance. #ContatoSeguro #Compliance",
+    url: "https://www.instagram.com/p/illustrative-cs-01/",
+    likes: 167, comments: 12, shares: 7, reach: 4200
+  },
+  {
+    id: 10, brand: "contato", channel: "li",
+    date: "2026-10-03", sentiment: "neu",
+    snippet: "Lei 14.457 / CIPA: avaliando <mark>Contato Seguro</mark> como canal de denúncias. Alguém compara com alternativas no mesmo ticket?",
+    url: "https://www.linkedin.com/feed/update/urn:li:activity:illustrative-005",
+    likes: 74, comments: 18, shares: 5, reach: null
+  },
+  {
+    id: 11, brand: "starian", channel: "ig",
+    date: "2026-10-06", sentiment: "pos",
+    snippet: "Floripa tech 🚀 Visita ao time <mark>Starian</mark> no Sapiens Parque. Ecossistemas SaaS de verdade.",
+    url: "https://www.instagram.com/p/illustrative-st-01/",
+    likes: 405, comments: 38, shares: 22, reach: 15200
+  },
+  {
+    id: 12, brand: "sienge", channel: "ig",
+    date: "2026-10-02", sentiment: "neg",
+    snippet: "Suporte ok, mas onboarding do <mark>Sienge</mark> pesou nas primeiras 2 semanas. Alguém tem playbook de go-live enxuto?",
+    url: "https://www.instagram.com/p/illustrative-sg-02/",
+    likes: 89, comments: 34, shares: 4, reach: 3100
+  }
+];
+
+const LABELS = {
+  starian: "Starian",
+  checklist: "Checklist Fácil",
+  projuris: "Projuris",
+  sienge: "Sienge",
+  contato: "Contato Seguro"
+};
+const CHAN = { li: "LI", ig: "IG", press: "News" };
+const CHAN_CLASS = { li: "li", ig: "ig", press: "press" };
+
+function fmt(n) {
+  if (n == null) return null;
+  return n.toLocaleString("pt-BR");
+}
+function fmtDate(iso) {
+  const [y,m,d] = iso.split("-");
+  return `${d}/${m}/${y}`;
+}
+
+function render() {
+  const feed = document.getElementById("feed");
+  feed.innerHTML = DATA.map(item => {
+    const likes = fmt(item.likes);
+    const comments = fmt(item.comments);
+    const shares = fmt(item.shares);
+    const reach = fmt(item.reach);
+    return `
+      <article class="card" data-brand="${item.brand}" data-channel="${item.channel}">
+        <div class="card-head">
+          <span class="pill ${CHAN_CLASS[item.channel]}">${CHAN[item.channel]}</span>
+          <span class="marca">${LABELS[item.brand]}</span>
+          <span class="sent ${item.sentiment}">${item.sentiment === "pos" ? "pos" : item.sentiment === "neg" ? "neg" : "neu"}</span>
+          <span class="when">${fmtDate(item.date)}</span>
+        </div>
+        <p class="snippet">${item.snippet}</p>
+        <div class="metrics">
+          <div class="metric"><label>Likes (post)</label><b>${likes ?? '<span class="na">—</span>'}</b></div>
+          <div class="metric"><label>Comentários</label><b>${comments ?? '<span class="na">—</span>'}</b></div>
+          <div class="metric"><label>Shares</label><b>${shares ?? '<span class="na">—</span>'}</b></div>
+          <div class="metric"><label>Alcance post</label><b>${reach ?? '<span class="na">—</span>'}</b></div>
+        </div>
+        <a class="source-link" href="${item.url}" target="_blank" rel="noopener">Abrir fonte ↗</a>
+      </article>`;
+  }).join("");
+
+  // counts
+  const byBrand = {};
+  let li=0, ig=0, press=0, engSum=0, engN=0;
+  DATA.forEach(d => {
+    byBrand[d.brand] = (byBrand[d.brand] || 0) + 1;
+    if (d.channel === "li") li++;
+    if (d.channel === "ig") ig++;
+    if (d.channel === "press") press++;
+    if (d.likes != null) {
+      engSum += d.likes + (d.comments||0) + (d.shares||0);
+      engN++;
+    }
+  });
+  document.getElementById("c-li").textContent = li;
+  document.getElementById("c-ig").textContent = ig;
+  document.getElementById("c-press").textContent = press;
+  document.getElementById("c-total").textContent = DATA.length;
+  document.getElementById("c-eng").textContent = engN ? Math.round(engSum/engN).toLocaleString("pt-BR") : "—";
+  document.getElementById("t-all").textContent = DATA.length;
+  Object.keys(LABELS).forEach(k => {
+    document.getElementById("t-" + k).textContent = byBrand[k] || 0;
+  });
+}
+
+function filter(brand) {
+  document.querySelectorAll(".card").forEach(card => {
+    card.classList.toggle("hidden", brand !== "all" && card.dataset.brand !== brand);
+  });
+}
+
+document.querySelectorAll(".tab").forEach(tab => {
+  tab.addEventListener("click", () => {
+    document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+    tab.classList.add("active");
+    filter(tab.dataset.brand);
+  });
+});
+
+render();
+</script>
+</body>
+</html>
